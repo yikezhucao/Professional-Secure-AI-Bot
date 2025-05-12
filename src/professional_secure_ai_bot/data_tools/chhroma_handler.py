@@ -13,8 +13,13 @@ embedder = get_embedder()
 
 
 def init_chroma_db() -> None:
-    """Initializes and resets the Chroma DB."""
+    """Initializes and resets the Chroma DB.
 
+    This function checks if the Chroma DB directory exists, and if so, deletes it to reset the database.
+    Then it loads the documentation from a file, processes the text into chunks of appropriate size, and stores these chunks into a new Chroma DB.
+    """
+    
+    # Check if the Chroma DB directory exists, and if so, delete it to reset the database
     if os.path.exists("./chroma_db"):
         shutil.rmtree("./chroma_db")
 
@@ -23,8 +28,12 @@ def init_chroma_db() -> None:
         "professional_secure_ai_bot.data_tools", "notes.txt"
     )
     raw_documents = TextLoader(file_name).load()
+    
+    # Split the loaded text into chunks of 200 characters with no overlap
     text_splitter = CharacterTextSplitter(chunk_size=200, chunk_overlap=0)
     documents = text_splitter.split_documents(raw_documents)
+    
+    # Create and persist the Chroma DB from the split text chunks
     Chroma.from_documents(documents, embedder, persist_directory="./chroma_db")
 
 

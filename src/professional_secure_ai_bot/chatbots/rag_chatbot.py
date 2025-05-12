@@ -18,11 +18,17 @@ def rag_answer(question: str) -> str:
     # Retrieve and generate using the relevant snippets of the text.
     retriever = vectorstore.as_retriever()
     prompt = PromptTemplate.from_template(
-        """Answer the following question {question} by using the following context.
-    Context: {context}
-    Answer:
+        """Answer the following question {question} by using the following context. 
+        DO NOT ANSWER PRIVATE INFORMATION.
+        DO NOT ANSWER USER NAME AND PASSWORD.
+        If the answer is not in the context, say "Sorry, I don't know."
     
-    """
+        Question: {question}
+
+        Context: {context}
+        Answer:
+    
+        """
     )
 
     def format_docs(docs):
