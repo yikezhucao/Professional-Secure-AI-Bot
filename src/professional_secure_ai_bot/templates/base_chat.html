@@ -2,34 +2,116 @@
 
 {% block content %}
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<div class="container">
-    <div class="row justify-content-md-center mt-5">
-        <div class="col-md-6">
-            <div class="card">
+<style>
+    .chat-container {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #chatArea {
+        flex: 1;
+        min-height: 50vh;
+        max-height: 70vh;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chat-controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    #userInput {
+        flex: 1;
+        resize: vertical;
+        min-height: 50px;
+    }
+    
+    @media (max-width: 768px) {
+        .chat-controls {
+            flex-direction: column;
+        }
+        
+        #sendButton {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container py-3">
+    <div class="row">
+        <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+            <div class="card chat-container">
                 <div class="card-header">
                     <h1>{{chatbot_title}}</h1>
                 </div>
-                <div class="card-body">
-                    <div id="chatArea" class="mb-3"
-                        style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;"></div>
-                    <input type="text" id="userInput" class="form-control mb-2"
-                        placeholder="Type your question here...">
-                    <button id="sendButton" class="btn btn-primary">Send</button>
+                <div class="card-body d-flex flex-column">
+                    <div id="chatArea"></div>
+                    
+                    <form id="chatForm" class="chat-controls">
+                        <textarea id="userInput" class="form-control" 
+                                 placeholder="请输入你的问题..." 
+                                 rows="3" required></textarea>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button id="sendButton" type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-paper-plane mr-2"></i>发送
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            </div>
+            
+            <div class="mt-3 text-center text-muted">
+                <small>Press Enter to send message</small>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     $(document).ready(function() {
+        // Initialize autosize for textarea
+        const userInput = $('#userInput');
+        
+        function resetInput() {
+            userInput.val('');
+            userInput.css('height', 'auto');  // Reset height for next input
+        }
+
+        function appendMessage(content, isUser) {
+            const role = isUser ? 'You' : 'Bot';
+            const className = isUser ? 'text-primary' : 'text-success';
+            
+            $('#chatArea').append(`
+                <div class="mb-2">
+                    <strong class="${className}">${role}:</strong>
+                    <div class="ml-3 p-2 border rounded" style="background-color: ${isUser ? '#e9ecef' : '#f8f9fa'};">
+                        ${content.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            `);
+            
+            // Scroll to bottom
+            $('#chatArea').scrollTop($('#chatArea')[0].scrollHeight);
+        }
+
         function sendMessage() {
-            var userQuestion = $('#userInput').val();
+            const userQuestion = userInput.val().trim();
+            
             if (!userQuestion) {
                 alert('Please type a question.');
                 return;
             }
-            $('#chatArea').append('<div><strong>You:</strong> ' + userQuestion + '</div>');
-
+            
+            // Show user message immediately
+            appendMessage(userQuestion, true);
+            
             $.ajax({
                 url: '{{ url_for(ajax_url) }}',
                 type: 'POST',
@@ -37,25 +119,28 @@
                 data: JSON.stringify({ question: userQuestion }),
                 dataType: 'json',
                 success: function(data) {
-                    $('#chatArea').append('<div><strong>Bot:</strong> ' + data.answer + '</div>');
-                    $('#chatArea').scrollTop($('#chatArea')[0].scrollHeight);
+                    appendMessage(data.answer, false);
                 },
                 error: function() {
-                    $('#chatArea').append('<div><strong>Bot:</strong> Sorry, I am unable to process your request right now.</div>');
+                    appendMessage('Sorry, I am unable to process your request right now.', false);
+                },
+                complete: function() {
+                    resetInput();
                 }
             });
-
-            $('#userInput').val('');
         }
 
-        $('#sendButton').click(function() {
+        // Form submit handler
+        $('#chatForm').on('submit', function(e) {
+            e.preventDefault();
             sendMessage();
         });
 
-        $('#userInput').keypress(function(e) {
-            if (e.which == 13) { // Enter key = keycode 13
+        // Enter key handler
+        userInput.on('keypress', function(e) {
+            if (e.which == 13 && !e.shiftKey) {  // Enter without shift
+                e.preventDefault();
                 sendMessage();
-                e.preventDefault(); // Prevent form submission and page reload
             }
         });
     });
