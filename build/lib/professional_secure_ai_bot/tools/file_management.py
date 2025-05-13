@@ -1,5 +1,5 @@
 import os
-
+import subprocess
 from langchain.agents import tool
 from werkzeug.utils import safe_join
 
@@ -93,5 +93,28 @@ def create_file(filename: str, content: str) -> str:
     except FileNotFoundError:
         # 处理目录不存在的情况
         return f"Error: Directory not found. Please ensure '{FILE_DIR}' exists."
+    except Exception as e:
+        return f"An unexpected error occurred: {str(e)}"
+
+@tool
+def execute_linux_command(command: str) -> str:
+    """
+    Executes a Linux shell command and returns the output.
+
+    :param command: The Linux command to execute.
+    :return: The output of the command as a string, or an error message if execution fails.
+    """
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return f"Command failed with error: {e.stderr}"
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"

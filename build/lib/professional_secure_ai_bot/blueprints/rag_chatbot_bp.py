@@ -5,16 +5,27 @@ from professional_secure_ai_bot.chatbots.rag_chatbot import rag_answer
 rag_chatbot = Blueprint("rag_chatbot", __name__)
 
 
+# @rag_chatbot.route("/ask", methods=["POST"])
+# def ask_question():
+#     """This route is used to send the question for answering."""
+#     data = request.get_json()
+#     question = data.get("question", "")
+#     if not question:
+#         return jsonify({"error": "Question is required."}), 400
+#     answer = rag_answer(question)
+#     return jsonify({"answer": answer})
+
 @rag_chatbot.route("/ask", methods=["POST"])
 def ask_question():
-    """This route is used to send the question for answering."""
     data = request.get_json()
     question = data.get("question", "")
     if not question:
         return jsonify({"error": "Question is required."}), 400
-    answer = rag_answer(question)
-    return jsonify({"answer": answer})
+    
+    result = rag_answer(question)  # 返回的是 dict: { "answer": ..., "log": ... }
 
+    # 直接返回整个 dict，或只返回需要的字段
+    return jsonify(result)
 
 @rag_chatbot.route("/chat")
 def chat():
