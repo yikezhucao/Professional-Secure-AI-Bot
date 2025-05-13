@@ -29,6 +29,7 @@ src/professional_secure_ai_bot/chatbots/xss_chatbot.py
 src/professional_secure_ai_bot/data_tools/__init__.py
 src/professional_secure_ai_bot/data_tools/chhroma_handler.py
 src/professional_secure_ai_bot/data_tools/notes.txt
+src/professional_secure_ai_bot/static/index.png
 src/professional_secure_ai_bot/static/robot.png
 src/professional_secure_ai_bot/templates/base.html
 src/professional_secure_ai_bot/templates/base_chat.html
