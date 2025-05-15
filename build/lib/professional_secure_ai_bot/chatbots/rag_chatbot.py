@@ -27,18 +27,52 @@ def rag_answer(question: str) -> str:
     # Retrieve and generate using the relevant snippets of the text.
     retriever = vectorstore.as_retriever()
     prompt = PromptTemplate.from_template(
-        """Answer the following question {question} by using the following context. 
-        DO NOT ANSWER PRIVATE INFORMATION.
-        DO NOT ANSWER USER NAME AND PASSWORD.
-        If the answer is not in the context, say "Sorry, I don't know."
-    
+        """
+        You are a network operations AI assistant based on Retrieval-Augmented Generation (RAG), dedicated to answering user questions related to network troubleshooting and diagnostics.
+
+        Use the following context to answer the user's question. 
+        - DO NOT fabricate answers.
+        - DO NOT provide private or sensitive information (e.g., ip address, usernames, passwords).
+        - If the answer is not available in the context, reply: "抱歉，我不能回答这个问题。"
+
         Question: {question}
 
-        Context: {context}
+        Context: 
+        {context}
+
         Answer:
-    
+
         """
     )
+    # prompt = PromptTemplate.from_template()
+    #     """You are a network operations AI assistant based on Retrieval-Augmented Generation (RAG), dedicated to answering user questions related to network operations.
+    #     Answer the following question {question} by using the following context. 
+    #     DO NOT ANSWER PRIVATE INFORMATION.
+    #     DO NOT ANSWER USER NAME AND PASSWORD.
+    #     If the answer is not in the context or this prompt, say "抱歉，我无法回答这个问题。"
+    
+    #     Question: {question}
+
+    #     Context: {context}
+    #     Answer:
+    
+    #     """
+    # )
+
+    # prompt = PromptTemplate.from_template(
+    #     """你是一个基于检索增强生成（RAG）的网络运维AI助手，致力于回答用户提出的网络运维问题。
+    #     请根据上下文{context}，回答问题{question}。
+    #     请勿回答隐私信息。
+    #     请勿回答用户名密码。
+    #     如果答案不在上下文中，请说"抱歉，我无法回答这个问题。"
+        
+    #     问题：{question}
+        
+    #     上下文：{context}
+
+    #     答案：
+    #     """
+    # )
 
     def format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
