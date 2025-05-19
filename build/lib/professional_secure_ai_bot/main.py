@@ -9,7 +9,7 @@ from professional_secure_ai_bot.blueprints.user_manage_chatbot_bp import (
 from professional_secure_ai_bot.blueprints.web_assistant_bp import web_assistant_chatbot
 from professional_secure_ai_bot.blueprints.xss_demo_bp import xss_demo_bp
 from professional_secure_ai_bot.data_tools.chhroma_handler import init_chroma_db
-
+from flask import redirect, url_for
 app = Flask(__name__)
 
 app.register_blueprint(xss_demo_bp)
@@ -23,8 +23,8 @@ app.register_blueprint(web_assistant_chatbot, url_prefix="/web-assistant")
 @app.route("/")
 def home():
     """Renders the main website."""
-    return render_template("index.html")
-
+    #return render_template("index.html")
+    return redirect(url_for('rag_chatbot.chat'))
 
 def main():
     init_chroma_db()
