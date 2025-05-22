@@ -31,10 +31,7 @@ def rag_answer(question: str) -> str:
         You are a network operations AI assistant based on Retrieval-Augmented Generation (RAG), dedicated to answering user questions related to network troubleshooting and diagnostics.
 
         Use the following context to answer the user's question. 
-        - DO NOT fabricate answers.
-        - DO NOT provide private or sensitive information (e.g., ip address, usernames, passwords).
-        - If the answer is not available in the context, reply: "抱歉，我不能回答这个问题。"
-
+        
         Question: {question}
 
         Context: 
