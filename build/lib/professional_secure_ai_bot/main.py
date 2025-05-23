@@ -1,4 +1,6 @@
 from flask import Flask, render_template
+import json
+from pathlib import Path
 
 from professional_secure_ai_bot.blueprints.rag_chatbot_bp import rag_chatbot
 from professional_secure_ai_bot.blueprints.text_management_bp import text_management_bp
@@ -12,13 +14,21 @@ from professional_secure_ai_bot.data_tools.chhroma_handler import init_chroma_db
 from flask import redirect, url_for
 app = Flask(__name__)
 
-app.register_blueprint(xss_demo_bp)
-app.register_blueprint(text_management_bp, url_prefix="/text-management")
+# app.register_blueprint(xss_demo_bp)
+# app.register_blueprint(text_management_bp, url_prefix="/text-management")
 app.register_blueprint(rag_chatbot, url_prefix="/rag-chatbot")
-app.register_blueprint(user_manage_chatbot, url_prefix="/user_manage_chatbot")
-app.register_blueprint(texteditor_bp, url_prefix="/text-editor")
-app.register_blueprint(web_assistant_chatbot, url_prefix="/web-assistant")
+# app.register_blueprint(user_manage_chatbot, url_prefix="/user_manage_chatbot")
+# app.register_blueprint(texteditor_bp, url_prefix="/text-editor")
+# app.register_blueprint(web_assistant_chatbot, url_prefix="/web-assistant")
 
+# 加载配置
+config_path = Path(__file__).parent / "config.json"
+with open(config_path, "r") as f:
+    config = json.load(f)
+
+# 条件性注册 Blueprint
+if config.get("enable_text_management", False):
+    app.register_blueprint(text_management_bp, url_prefix="/text-management")
 
 @app.route("/")
 def home():
